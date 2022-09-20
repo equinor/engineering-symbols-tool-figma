@@ -1,3 +1,4 @@
+import { designGroupName } from "./constants";
 import { AnnotationSymbol, SymbolValidationResult } from "./types";
 
 export function validateSelectionAsSymbol(
@@ -13,32 +14,34 @@ export function validateSelectionAsSymbol(
     error = "Unknown error occurred!";
   }
 
-  if (error) {
-    figma.ui.postMessage({ symbolValidationError: error });
-    return;
-  }
+  const payload = error
+    ? { symbolValidationError: error }
+    : {
+        symbol:
+          validationResult.annotationSymbol?.mainFrame.name ?? "No name??",
+      };
 
-  figma.ui.postMessage({
-    symbol: validationResult.annotationSymbol?.mainFrame.name ?? "No name??",
-  });
+  figma.ui.postMessage(payload);
 }
 
 export function validateSymbol(
   nodes: ReadonlyArray<SceneNode>
 ): SymbolValidationResult {
   const selectionErrorMsg =
-    "Select a single Frame that contains a Frame named 'Symbol' and a Group 'Annotations'";
+    "Select a single Frame that contains two Groups: 'Design' and 'Annotations'";
 
   if (!(nodes.length == 1 && nodes[0].type == "FRAME"))
     return { validationError: selectionErrorMsg };
 
   const frame = nodes[0];
 
-  const symbolFrames = frame.children.filter(
-    (c) => c.name.toLowerCase() === "symbol" && c.type === "FRAME"
-  ) as FrameNode[];
+  const symbolGroups = frame.children.filter(
+    (c) =>
+      c.name.toLowerCase() === designGroupName.toLowerCase() &&
+      c.type === "GROUP"
+  ) as GroupNode[];
 
-  if (symbolFrames.length != 1) return { validationError: selectionErrorMsg };
+  if (symbolGroups.length != 1) return { validationError: selectionErrorMsg };
 
   const annotationsGroups = frame.children.filter(
     (c) => c.name.toLowerCase() === "annotations" && c.type === "GROUP"
@@ -56,13 +59,13 @@ export function validateSymbol(
   if (frame.height % 24 !== 0 || frame.width % 24 !== 0)
     return {
       validationError:
-        "The Symbol frame width and height must be a factor of 24",
+        "The Symbol frame width and height must be a multiple of 24",
     };
 
   return {
     annotationSymbol: {
       mainFrame: frame,
-      symbolFrame: symbolFrames[0],
+      symbolGroup: symbolGroups[0],
       annotationsGroup: annotationsGroups[0],
     },
   };

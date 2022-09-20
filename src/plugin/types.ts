@@ -7,7 +7,7 @@ export type PluginAction = {
 
 export type AnnotationSymbol = {
   mainFrame: FrameNode;
-  symbolFrame: FrameNode;
+  symbolGroup: GroupNode;
   annotationsGroup: GroupNode;
 };
 

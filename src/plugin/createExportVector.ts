@@ -1,8 +1,8 @@
 import { AnnotationSymbol } from "./types";
 import { validateSymbol } from "./validation";
 
-const t = ["POLYGON", "LINE", "ELLIPSE", "RECTANGLE"];
-type ttt = LineNode | RectangleNode | EllipseNode | PolygonNode;
+const t = ["POLYGON", "LINE", "ELLIPSE", "RECTANGLE", "VECTOR"];
+type ttt = LineNode | RectangleNode | EllipseNode | PolygonNode | VectorNode;
 
 export function createExportVector(nodes: ReadonlyArray<SceneNode>) {
   const validationResult = validateSymbol(nodes);
@@ -15,50 +15,45 @@ export function createExportVector(nodes: ReadonlyArray<SceneNode>) {
     return;
   }
 
-  const { mainFrame, symbolFrame, annotationsGroup } =
+  const { mainFrame, symbolGroup, annotationsGroup } =
     validationResult.annotationSymbol;
+
+  // TODO: Delete existing "Symbol" vectors!
 
   // Clone symbol group
 
-  const symbolFrameExp = symbolFrame.clone();
-  symbolFrameExp.name = "Symbol_EXP";
-
-  mainFrame.appendChild(symbolFrameExp);
-
   const vNodes: VectorNode[] = [];
 
-  for (let i = 0; i < symbolFrameExp.children.length; i++) {
-    const child = symbolFrameExp.children[i];
+  for (let i = 0; i < symbolGroup.children.length; i++) {
+    const child = symbolGroup.children[i];
     if (t.indexOf(child.type) == -1) continue;
     const d = child as ttt;
-    const vNode = d.outlineStroke();
-    if (vNode) vNodes.push(vNode);
-  }
-
-  // Delete existing nodes in cloned Symbol frame
-  // For some weird reason we have to perform remove loop many times...
-  while (symbolFrameExp.children.length > 0) {
-    for (let i = 0; i < symbolFrameExp.children.length; i++) {
-      console.log("Remove:", symbolFrameExp.children[i].name);
-      symbolFrameExp.children[i].remove();
+    const vNode = d.type === "VECTOR" ? d.clone() : d.outlineStroke();
+    if (vNode) {
+      vNode.name += "_tmp";
+      vNodes.push(vNode);
     }
   }
 
   // Add outlined nodes (vectors) to export frame
   for (let i = 0; i < vNodes.length; i++) {
-    symbolFrameExp.appendChild(vNodes[i]);
+    mainFrame.appendChild(vNodes[i]);
   }
 
+  const tmpVectors = mainFrame.findChildren((c) => {
+    const a = c.name.split("_");
+    return a[a.length - 1] === "tmp";
+  });
+
   // Union and flatten the outlined vectors
-  figma.union(symbolFrameExp.children, symbolFrameExp);
-  figma.flatten(symbolFrameExp.children, symbolFrameExp);
+  const union = figma.union(tmpVectors, mainFrame);
+  const symbolVector = figma.flatten([union], mainFrame);
 
-  console.log({ ...symbolFrameExp.children });
+  symbolVector.name = "Symbol";
+  symbolVector.x = symbolGroup.x;
+  symbolVector.y = symbolGroup.y;
 
-  // const exp = await mainFrame.exportAsync({
-  //   format: "SVG",
-  //   svgIdAttribute: true,
-  //   svgOutlineText: true,
-  //   svgSimplifyStroke: false,
-  // });
+  const fills = JSON.parse(JSON.stringify(symbolVector.fills));
+  fills[0].color = { r: 0, g: 0, b: 0 };
+  symbolVector.fills = fills;
 }
