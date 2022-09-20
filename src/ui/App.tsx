@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import "./App.css";
 import { ExportTab } from "./export-tab";
-import { CreateTab } from "./create-tab";
+import { TemplateTab } from "./template-tab";
 
 type Tab = {
-  name: "Export" | "Create";
+  name: "Export" | "Templates";
   active: boolean;
 };
 
 function App() {
   const [tabs, setTabs] = useState<Tab[]>([
     { name: "Export", active: true },
-    { name: "Create", active: false },
+    { name: "Templates", active: false },
   ]);
 
   const [activeTab, setActiveTab] = useState<Tab["name"]>("Export");
@@ -40,7 +40,7 @@ function App() {
         {
           {
             Export: <ExportTab />,
-            Create: <CreateTab />,
+            Templates: <TemplateTab />,
           }[activeTab]
         }
       </section>

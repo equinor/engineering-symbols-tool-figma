@@ -25,7 +25,7 @@ export function ExportTab() {
     } else if (msg.symbol) {
       setSymbol(msg.symbol);
       setValidationError(undefined);
-    } else if (msg.pluginMessage.newSelection) {
+    } else if (msg.pluginMessage.selectionchange) {
       requestSelectionValidation();
     }
   };

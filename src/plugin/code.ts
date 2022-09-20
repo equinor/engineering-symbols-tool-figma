@@ -6,7 +6,8 @@ type ShowUiOptionsExtended = ShowUIOptions & { themeColors: boolean };
 
 figma.showUI(__html__, {
   title: "Engineering Symbols Tool",
-  height: 300,
+  height: 450,
+  width: 450,
   themeColors: true,
 } as ShowUiOptionsExtended);
 
@@ -33,6 +34,6 @@ figma.ui.onmessage = (msg: PluginAction) => {
 figma.on("selectionchange", () => {
   console.log(figma.currentPage.selection);
   figma.ui.postMessage({
-    pluginMessage: { newSelection: figma.currentPage.selection },
+    pluginMessage: { selectionchange: figma.currentPage.selection },
   });
 });

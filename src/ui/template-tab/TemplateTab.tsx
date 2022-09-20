@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import { AnnotationSymbol, PluginAction } from "../../plugin/types";
 
-import "./CreateTab.css";
+import "./TemplateTab.css";
 
-export function CreateTab() {
+export function TemplateTab() {
   return (
     <>
       <p>Create Symbol Templates</p>
