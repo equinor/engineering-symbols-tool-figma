@@ -104,16 +104,16 @@ svg {
 }
 
 main {
-  //align-items: center;
+  /* align-items: center; */
   display: grid;
   grid-template-rows: [nav] 50px [content] auto;
   height: 100%;
-  //background: red;
+  /* background: red; */
 }
 
 nav {
   grid-area: [nav];
-  //background: green;
+  /* background: green; */
   display: flex;
   gap: 10px;
   padding: 10px;
@@ -122,5 +122,5 @@ nav {
 
 section {
   grid-area: [content];
-  //background: yellow;
+  /* background: yellow; */
 }

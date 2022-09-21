@@ -1,37 +1,61 @@
 import { designGroupName } from "./constants";
-import { AnnotationSymbol, SymbolValidationResult } from "./types";
+import {
+  AnnotationSymbol,
+  AnnotationSymbolUi,
+  SymbolValidationResult,
+  UiMessage,
+  ValidationError,
+} from "./types";
+
+function AnnotationSymbolToUi(symbol: AnnotationSymbol): AnnotationSymbolUi {
+  return {
+    id: symbol.id,
+    name: symbol.mainFrame.name,
+    width: symbol.mainFrame.width,
+    height: symbol.mainFrame.height,
+    designGroupId: symbol.designGroup.id,
+    annotationGroupId: symbol.annotationsGroup.id,
+  };
+}
+
+function getValidationUiMessage(result: SymbolValidationResult): UiMessage {
+  return {
+    type: "symbol-validation-result",
+    payload: {
+      symbol: result.annotationSymbol
+        ? AnnotationSymbolToUi(result.annotationSymbol)
+        : undefined,
+      validationErrors: result.validationErrors,
+    },
+  };
+}
 
 export function validateSelectionAsSymbol(
   nodes: ReadonlyArray<SceneNode>
 ): void {
   const validationResult = validateSymbol(nodes);
+  const msg = getValidationUiMessage(validationResult);
+  figma.ui.postMessage(msg);
+}
 
-  let error = undefined;
-
-  if (validationResult.validationError) {
-    error = validationResult.validationError;
-  } else if (!validationResult.annotationSymbol) {
-    error = "Unknown error occurred!";
-  }
-
-  const payload = error
-    ? { symbolValidationError: error }
-    : {
-        symbol:
-          validationResult.annotationSymbol?.mainFrame.name ?? "No name??",
-      };
-
-  figma.ui.postMessage(payload);
+export function validateNodeAsSymbol(nodeId: string): void {
+  const node = figma.currentPage.findOne((n) => n.id === nodeId);
+  const validationResult = validateSymbol(node ? [node] : []);
+  const msg = getValidationUiMessage(validationResult);
+  figma.ui.postMessage(msg);
 }
 
 export function validateSymbol(
   nodes: ReadonlyArray<SceneNode>
 ): SymbolValidationResult {
-  const selectionErrorMsg =
-    "Select a single Frame that contains two Groups: 'Design' and 'Annotations'";
+  const selectionErrorMsg: ValidationError = {
+    category: "Invalid Selection",
+    error:
+      "Select a single Frame that contains two Groups: 'Design' and 'Annotations'",
+  };
 
   if (!(nodes.length == 1 && nodes[0].type == "FRAME"))
-    return { validationError: selectionErrorMsg };
+    return { validationErrors: [selectionErrorMsg] };
 
   const frame = nodes[0];
 
@@ -41,32 +65,39 @@ export function validateSymbol(
       c.type === "GROUP"
   ) as GroupNode[];
 
-  if (symbolGroups.length != 1) return { validationError: selectionErrorMsg };
+  if (symbolGroups.length != 1)
+    return { validationErrors: [selectionErrorMsg] };
 
   const annotationsGroups = frame.children.filter(
     (c) => c.name.toLowerCase() === "annotations" && c.type === "GROUP"
   ) as GroupNode[];
 
   if (annotationsGroups.length != 1)
-    return { validationError: selectionErrorMsg };
+    return { validationErrors: [selectionErrorMsg] };
+
+  const errors: ValidationError[] = [];
+
+  const symbol = {
+    id: frame.id,
+    mainFrame: frame,
+    designGroup: symbolGroups[0],
+    annotationsGroup: annotationsGroups[0],
+  };
 
   if (frame.width < 24 || frame.height < 24)
-    return {
-      validationError:
-        "The Symbol frame width and height must greater than 24px",
-    };
+    errors.push({
+      category: "Frame dimensions",
+      error: "The Symbol frame width and height must greater than 24px",
+    });
 
   if (frame.height % 24 !== 0 || frame.width % 24 !== 0)
-    return {
-      validationError:
-        "The Symbol frame width and height must be a multiple of 24",
-    };
+    errors.push({
+      category: "Frame dimensions",
+      error: "The Symbol frame width and height must be a multiple of 24",
+    });
 
   return {
-    annotationSymbol: {
-      mainFrame: frame,
-      symbolGroup: symbolGroups[0],
-      annotationsGroup: annotationsGroups[0],
-    },
+    annotationSymbol: symbol,
+    validationErrors: errors,
   };
 }

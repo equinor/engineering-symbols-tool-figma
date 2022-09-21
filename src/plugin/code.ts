@@ -1,8 +1,15 @@
-import { createExportVector } from "./createExportVector";
-import { PluginAction } from "./types";
-import { validateSelectionAsSymbol } from "./validation";
+import { createExportVectorFromNodeId } from "./createExportVector";
+import { PluginAction, SelectionChangedMessage } from "./types";
+import { validateNodeAsSymbol, validateSelectionAsSymbol } from "./validation";
 
 type ShowUiOptionsExtended = ShowUIOptions & { themeColors: boolean };
+
+function getSelectionChangedUiMsg(): SelectionChangedMessage {
+  return {
+    type: "selection-changed",
+    payload: { selection: figma.currentPage.selection },
+  };
+}
 
 figma.showUI(__html__, {
   title: "Engineering Symbols Tool",
@@ -11,20 +18,19 @@ figma.showUI(__html__, {
   themeColors: true,
 } as ShowUiOptionsExtended);
 
-figma.ui.postMessage({
-  pluginMessage: { newSelection: figma.currentPage.selection },
-});
+figma.ui.postMessage(getSelectionChangedUiMsg());
 
 figma.ui.onmessage = (msg: PluginAction) => {
+  //console.log("From UI:", msg);
   switch (msg.type) {
-    case "create-symbol":
-      break;
-
     case "create-export-vector":
-      createExportVector(figma.currentPage.selection);
+      createExportVectorFromNodeId(msg.payload.nodeId);
       break;
     case "validate-selection-as-symbol":
       validateSelectionAsSymbol(figma.currentPage.selection);
+      break;
+    case "validate-node-as-symbol":
+      validateNodeAsSymbol(msg.payload.nodeId);
       break;
     default:
       break;
@@ -32,8 +38,6 @@ figma.ui.onmessage = (msg: PluginAction) => {
 };
 
 figma.on("selectionchange", () => {
-  console.log(figma.currentPage.selection);
-  figma.ui.postMessage({
-    pluginMessage: { selectionchange: figma.currentPage.selection },
-  });
+  //console.log(figma.currentPage.selection);
+  figma.ui.postMessage(getSelectionChangedUiMsg());
 });
