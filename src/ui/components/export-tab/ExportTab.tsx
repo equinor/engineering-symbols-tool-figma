@@ -8,9 +8,15 @@ import {
 import { postMessageToPlugin } from "../../helpers/pluginHelpers";
 
 export function ExportTab() {
-  const { symbol, setSymbol, validationErrors } = useContext(
+  const { symbol, setSymbol, validationErrors, isValid } = useContext(
     SymbolContext
   ) as SymbolContextProviderValue;
+
+  const [canExport, setCanExport] = useState(false);
+
+  useEffect(() => {
+    setCanExport(symbol?.symbolVectorId !== undefined && isValid);
+  }, [symbol?.symbolVectorId, isValid]);
 
   const onCreate = () => {
     if (symbol === undefined || symbol.id === undefined) return;
@@ -20,22 +26,30 @@ export function ExportTab() {
     });
   };
 
-  const revalidate = () => {
+  const onExportAsSvg = () => {
     if (symbol === undefined || symbol.id === undefined) return;
     postMessageToPlugin({
-      type: "validate-node-as-symbol",
+      type: "create-export-blob",
       payload: { nodeId: symbol.id },
     });
   };
 
-  const selectNewSymbol = () => {
-    if (!symbol) return;
-    setSymbol();
-    postMessageToPlugin({
-      type: "validate-selection-as-symbol",
-      payload: null,
-    });
-  };
+  // const revalidate = () => {
+  //   if (symbol === undefined || symbol.id === undefined) return;
+  //   postMessageToPlugin({
+  //     type: "validate-node-as-symbol",
+  //     payload: { nodeId: symbol.id },
+  //   });
+  // };
+
+  // const selectNewSymbol = () => {
+  //   if (!symbol) return;
+  //   setSymbol();
+  //   postMessageToPlugin({
+  //     type: "validate-selection-as-symbol",
+  //     payload: null,
+  //   });
+  // };
 
   if (symbol) {
     return (
@@ -50,15 +64,23 @@ export function ExportTab() {
             </p>
           );
         })}
-        <button className={"brand"} onClick={() => onCreate()}>
-          Create Export Symbol
-        </button>
-        <button className={"brand"} onClick={() => revalidate()}>
+        {isValid && (
+          <button className={"brand"} onClick={() => onCreate()}>
+            Create Export Symbol
+          </button>
+        )}
+        {canExport && (
+          <button className={"brand"} onClick={() => onExportAsSvg()}>
+            Export As SVG
+          </button>
+        )}
+
+        {/* <button className={"brand"} onClick={() => revalidate()}>
           Re-evaluate
         </button>
         <button className={"brand"} onClick={() => selectNewSymbol()}>
           Select new Symbol
-        </button>
+        </button> */}
       </div>
     );
   }

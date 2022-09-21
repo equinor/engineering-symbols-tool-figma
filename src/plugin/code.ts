@@ -1,4 +1,5 @@
 import { createExportVectorFromNodeId } from "./createExportVector";
+import { exportAsSvg } from "./exportAsSvg";
 import { PluginAction, SelectionChangedMessage } from "./types";
 import { validateNodeAsSymbol, validateSelectionAsSymbol } from "./validation";
 
@@ -32,6 +33,8 @@ figma.ui.onmessage = (msg: PluginAction) => {
     case "validate-node-as-symbol":
       validateNodeAsSymbol(msg.payload.nodeId);
       break;
+    case "create-export-blob":
+      exportAsSvg(msg.payload.nodeId);
     default:
       break;
   }

@@ -1,5 +1,6 @@
 export type PluginActionType =
   | "create-export-vector"
+  | "create-export-blob"
   | "validate-selection-as-symbol"
   | "validate-node-as-symbol";
 
@@ -10,6 +11,11 @@ export type PluginActionBase<TActionType extends PluginActionType, TPayload> = {
 
 export type CreateExportVectorAction = PluginActionBase<
   "create-export-vector",
+  { nodeId: string }
+>;
+
+export type CreateExportBlobAction = PluginActionBase<
+  "create-export-blob",
   { nodeId: string }
 >;
 
@@ -26,9 +32,13 @@ export type ValidateNodeAsSymbolAction = PluginActionBase<
 export type PluginAction =
   | ValidateNodeAsSymbolAction
   | ValidateSelectionAsSymbolAction
-  | CreateExportVectorAction;
+  | CreateExportVectorAction
+  | CreateExportBlobAction;
 
-export type UiMessageType = "selection-changed" | "symbol-validation-result";
+export type UiMessageType =
+  | "selection-changed"
+  | "symbol-validation-result"
+  | "export-as-svg";
 
 export type UiMessageBase<TMessageType extends UiMessageType, TPayload> = {
   type: TMessageType;
@@ -45,7 +55,15 @@ export type SymbolValidationResultMessage = UiMessageBase<
   { validationErrors: ValidationError[]; symbol?: AnnotationSymbolUi }
 >;
 
-export type UiMessage = SelectionChangedMessage | SymbolValidationResultMessage;
+export type ExportAsSvgMessage = UiMessageBase<
+  "export-as-svg",
+  { uInt8Array: Uint8Array; fileName: string }
+>;
+
+export type UiMessage =
+  | SelectionChangedMessage
+  | SymbolValidationResultMessage
+  | ExportAsSvgMessage;
 
 export type AnnotationSymbolUi = {
   id: string;
@@ -54,6 +72,7 @@ export type AnnotationSymbolUi = {
   height: number;
   designGroupId: string;
   annotationGroupId: string;
+  symbolVectorId?: string;
 };
 
 export type AnnotationSymbol = {
@@ -61,6 +80,7 @@ export type AnnotationSymbol = {
   mainFrame: FrameNode;
   designGroup: GroupNode;
   annotationsGroup: GroupNode;
+  symbolVectorId?: string;
 };
 
 export type ValidationError = { category: string; error: string };

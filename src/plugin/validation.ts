@@ -15,6 +15,7 @@ function AnnotationSymbolToUi(symbol: AnnotationSymbol): AnnotationSymbolUi {
     height: symbol.mainFrame.height,
     designGroupId: symbol.designGroup.id,
     annotationGroupId: symbol.annotationsGroup.id,
+    symbolVectorId: symbol.symbolVectorId,
   };
 }
 
@@ -77,12 +78,25 @@ export function validateSymbol(
 
   const errors: ValidationError[] = [];
 
-  const symbol = {
+  const symbol: AnnotationSymbol = {
     id: frame.id,
     mainFrame: frame,
     designGroup: symbolGroups[0],
     annotationsGroup: annotationsGroups[0],
   };
+
+  const symbolVectors = frame.children.filter(
+    (c) => c.name.toLowerCase() === "symbol" && c.type === "VECTOR"
+  ) as VectorNode[];
+
+  if (symbolVectors.length === 1) symbol.symbolVectorId = symbolVectors[0].id;
+
+  if (symbolVectors.length > 1)
+    errors.push({
+      category: "Symbol Export Layer",
+      error:
+        "The Symbol frame contains more than one Symbol Export Layer named 'Symbol'",
+    });
 
   if (frame.width < 24 || frame.height < 24)
     errors.push({

@@ -14,6 +14,7 @@ import {
   ValidationError,
 } from "../../plugin/types";
 import { postMessageToPlugin } from "../helpers/pluginHelpers";
+import { saveBlob } from "../helpers/saveBlob";
 
 type SymbolContextProviderProps = { children: React.ReactNode };
 
@@ -21,6 +22,7 @@ export type SymbolContextProviderValue = {
   symbol?: AnnotationSymbolUi;
   setSymbol: (symbol?: AnnotationSymbolUi) => void;
   validationErrors: ValidationError[];
+  isValid: boolean;
 };
 
 export const SymbolContext = createContext<SymbolContextProviderValue | null>(
@@ -48,6 +50,14 @@ export function SymbolContextProvider({
     _setValidationErrors([...validationErrorsRef.current]);
   };
 
+  const [isValid, setIsValid] = useState<boolean>(false);
+
+  useEffect(() => {
+    let errors = 0;
+    if (validationErrors.length > 0) errors++;
+    setIsValid(errors === 0);
+  }, [validationErrors]);
+
   const requestSelectionValidation = () => {
     const action: PluginAction = {
       type: "validate-selection-as-symbol",
@@ -65,12 +75,14 @@ export function SymbolContextProvider({
 
     switch (msg.type) {
       case "symbol-validation-result":
-        //if (symbolRef.current?.id !== msg.payload.symbol?.id)
         setSymbol(msg.payload.symbol);
         setValidationErrors(msg.payload.validationErrors);
         break;
       case "selection-changed":
         requestSelectionValidation();
+        break;
+      case "export-as-svg":
+        saveBlob(msg.payload.uInt8Array, msg.payload.fileName);
       default:
         break;
     }
@@ -99,7 +111,8 @@ export function SymbolContextProvider({
   }, []);
 
   return (
-    <SymbolContext.Provider value={{ symbol, setSymbol, validationErrors }}>
+    <SymbolContext.Provider
+      value={{ symbol, setSymbol, validationErrors, isValid }}>
       {children}
     </SymbolContext.Provider>
   );
