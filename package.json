@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react-dom": "^17.0.0",
+    "vite-plugin-svgr": "^2.2.1"
   },
   "devDependencies": {
     "@figma/plugin-typings": "*",

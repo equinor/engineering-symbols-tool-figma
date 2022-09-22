@@ -6,17 +6,19 @@ import {
   SymbolContextProviderValue,
 } from "../../context/SymbolProvider";
 import { postMessageToPlugin } from "../../helpers/pluginHelpers";
+import { InvalidSelection } from "../invalid-selection";
 
 export function ExportTab() {
-  const { symbol, setSymbol, validationErrors, isValid } = useContext(
+  const { symbol, validationErrors, isValid } = useContext(
     SymbolContext
   ) as SymbolContextProviderValue;
 
   const [canExport, setCanExport] = useState(false);
 
   useEffect(() => {
-    setCanExport(symbol?.symbolVectorId !== undefined && isValid);
-  }, [symbol?.symbolVectorId, isValid]);
+    //console.log("symbol?.symbolVectorData", symbol?.symbolVectorData);
+    setCanExport(symbol?.symbolVectorData !== undefined && isValid);
+  }, [symbol?.symbolVectorData, isValid]);
 
   const onCreate = () => {
     if (symbol === undefined || symbol.id === undefined) return;
@@ -34,55 +36,54 @@ export function ExportTab() {
     });
   };
 
-  // const revalidate = () => {
-  //   if (symbol === undefined || symbol.id === undefined) return;
-  //   postMessageToPlugin({
-  //     type: "validate-node-as-symbol",
-  //     payload: { nodeId: symbol.id },
-  //   });
-  // };
-
-  // const selectNewSymbol = () => {
-  //   if (!symbol) return;
-  //   setSymbol();
-  //   postMessageToPlugin({
-  //     type: "validate-selection-as-symbol",
-  //     payload: null,
-  //   });
-  // };
+  const canCreateExportSymbol =
+    (validationErrors.length === 1 &&
+      validationErrors[0].category === "Export Layer Fill Rule") ||
+    isValid;
 
   if (symbol) {
     return (
-      <div>
-        <p>
-          {symbol.name} ({symbol.id})
-        </p>
-        {validationErrors.map((e) => {
-          return (
-            <p>
-              {e.category}: {e.error}
-            </p>
-          );
-        })}
-        {isValid && (
-          <button className={"brand"} onClick={() => onCreate()}>
-            Create Export Symbol
+      <div className="symbolContainer">
+        <div className="content">
+          <h1>{symbol.name}</h1>
+          <p>
+            <span className="secondary-color ">W</span>&nbsp;&nbsp;{" "}
+            {symbol.width} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span className="secondary-color ">H</span>&nbsp;&nbsp;{" "}
+            {symbol.width}
+          </p>
+          {validationErrors.map((e) => {
+            return (
+              <div className="error-item">
+                <h4>{e.category}</h4>
+                <p>{e.error}</p>
+              </div>
+            );
+          })}
+        </div>
+        <div className="buttons">
+          <button
+            className={canCreateExportSymbol ? "brand" : "brand-disabled"}
+            disabled={!canCreateExportSymbol}
+            onClick={() => onCreate()}>
+            {symbol.symbolVectorData
+              ? "Re-Create Export Layer"
+              : "Create Export Layer"}
           </button>
-        )}
-        {canExport && (
-          <button className={"brand"} onClick={() => onExportAsSvg()}>
+
+          <button
+            className={canExport ? "brand" : "brand-disabled"}
+            disabled={!canExport}
+            onClick={() => onExportAsSvg()}>
             Export As SVG
           </button>
-        )}
-
-        {/* <button className={"brand"} onClick={() => revalidate()}>
-          Re-evaluate
-        </button>
-        <button className={"brand"} onClick={() => selectNewSymbol()}>
-          Select new Symbol
-        </button> */}
+        </div>
       </div>
     );
+  }
+
+  if (validationErrors.some((e) => e.category === "Invalid Selection")) {
+    return <InvalidSelection />;
   }
 
   return (

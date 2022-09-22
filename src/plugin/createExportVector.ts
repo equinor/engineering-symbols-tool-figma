@@ -72,8 +72,8 @@ function createExportVector(mainFrame: FrameNode, designGroup: GroupNode) {
   });
 
   // Union and flatten the outlined vectors
-  const union = figma.union(tmpVectors, mainFrame);
-  const symbolVector = figma.flatten([union], mainFrame);
+  const union = figma.union(tmpVectors, mainFrame, 0);
+  const symbolVector = figma.flatten([union], mainFrame, 0);
 
   symbolVector.name = "Symbol";
   symbolVector.x = designGroup.x;

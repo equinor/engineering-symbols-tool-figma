@@ -1,6 +1,7 @@
 export type PluginActionType =
   | "create-export-vector"
   | "create-export-blob"
+  | "export-vector-network-updated"
   | "validate-selection-as-symbol"
   | "validate-node-as-symbol";
 
@@ -19,6 +20,11 @@ export type CreateExportBlobAction = PluginActionBase<
   { nodeId: string }
 >;
 
+export type ExportVectorNetworkUpdatedAction = PluginActionBase<
+  "export-vector-network-updated",
+  { symbolVectorData: SymbolVectorData }
+>;
+
 export type ValidateSelectionAsSymbolAction = PluginActionBase<
   "validate-selection-as-symbol",
   null
@@ -33,7 +39,8 @@ export type PluginAction =
   | ValidateNodeAsSymbolAction
   | ValidateSelectionAsSymbolAction
   | CreateExportVectorAction
-  | CreateExportBlobAction;
+  | CreateExportBlobAction
+  | ExportVectorNetworkUpdatedAction;
 
 export type UiMessageType =
   | "selection-changed"
@@ -65,6 +72,11 @@ export type UiMessage =
   | SymbolValidationResultMessage
   | ExportAsSvgMessage;
 
+export type SymbolVectorData = {
+  id: string;
+  vectorNetwork: VectorNetwork;
+};
+
 export type AnnotationSymbolUi = {
   id: string;
   name: string;
@@ -72,7 +84,7 @@ export type AnnotationSymbolUi = {
   height: number;
   designGroupId: string;
   annotationGroupId: string;
-  symbolVectorId?: string;
+  symbolVectorData?: SymbolVectorData;
 };
 
 export type AnnotationSymbol = {
@@ -80,10 +92,18 @@ export type AnnotationSymbol = {
   mainFrame: FrameNode;
   designGroup: GroupNode;
   annotationsGroup: GroupNode;
-  symbolVectorId?: string;
+  symbolVectorData?: SymbolVectorData;
 };
 
-export type ValidationError = { category: string; error: string };
+export type ValidationErrorCategory =
+  | "Export Layer Fill Rule"
+  | "Symbol Frame Dimensions"
+  | "Invalid Selection";
+
+export type ValidationError = {
+  category: ValidationErrorCategory;
+  error: string;
+};
 
 export type SymbolValidationResult = {
   annotationSymbol?: AnnotationSymbol;
@@ -102,15 +122,3 @@ export interface SymbolConnector {
   relativePosition: { x: number; y: number };
   direction: number;
 }
-
-// export type UiMessage<TMsgType> = {
-//   type: TMsgType;
-// }
-
-// export type UiMessageType = "";
-
-// export interface UiMessage {
-//   id: string;
-//   relativePosition: { x: number; y: number };
-//   direction: number;
-// }

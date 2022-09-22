@@ -2,17 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import "./TabContainer.css";
 import { ExportTab } from "../export-tab";
 import { TemplateTab } from "../template-tab";
+import { FillRuleEditor } from "../fill-rule-editor/FillRuleEditor";
+import { HelpTab } from "../help-tab";
 
 type Tab = {
-  name: "Export" | "Fill Rule" | "Templates";
+  name: "Export" | "Fill Rule Editor" | "Templates" | "Help";
   active: boolean;
 };
 
 export function TabContainer() {
   const [tabs, setTabs] = useState<Tab[]>([
     { name: "Export", active: true },
-    { name: "Fill Rule", active: false },
+    { name: "Fill Rule Editor", active: false },
     { name: "Templates", active: false },
+    { name: "Help", active: false },
   ]);
 
   const [activeTab, setActiveTab] = useState<Tab["name"]>("Export");
@@ -41,8 +44,9 @@ export function TabContainer() {
         {
           {
             Export: <ExportTab />,
-            "Fill Rule": <p>Full rule editor</p>,
+            "Fill Rule Editor": <FillRuleEditor />,
             Templates: <TemplateTab />,
+            Help: <HelpTab />,
           }[activeTab]
         }
       </section>

@@ -15,7 +15,7 @@ function AnnotationSymbolToUi(symbol: AnnotationSymbol): AnnotationSymbolUi {
     height: symbol.mainFrame.height,
     designGroupId: symbol.designGroup.id,
     annotationGroupId: symbol.annotationsGroup.id,
-    symbolVectorId: symbol.symbolVectorId,
+    symbolVectorData: symbol.symbolVectorData,
   };
 }
 
@@ -89,24 +89,44 @@ export function validateSymbol(
     (c) => c.name.toLowerCase() === "symbol" && c.type === "VECTOR"
   ) as VectorNode[];
 
-  if (symbolVectors.length === 1) symbol.symbolVectorId = symbolVectors[0].id;
+  if (symbolVectors.length === 1) {
+    symbol.symbolVectorData = {
+      id: symbolVectors[0].id,
+      vectorNetwork: JSON.parse(JSON.stringify(symbolVectors[0].vectorNetwork)),
+    };
+
+    const vnRegions = symbol.symbolVectorData.vectorNetwork.regions;
+
+    if (vnRegions) {
+      for (let j = 0; j < vnRegions.length; j++) {
+        const r = vnRegions[j];
+        if (r.windingRule === "NONZERO") continue;
+        errors.push({
+          category: "Export Layer Fill Rule",
+          error:
+            "The Symbol export layer contains 'even-odd' regions, but only 'non-zero' is accepted. Use the Fill Rule editor to set all regions to 'non-zero'.",
+        });
+        break;
+      }
+    }
+  }
 
   if (symbolVectors.length > 1)
     errors.push({
-      category: "Symbol Export Layer",
+      category: "Symbol Frame Dimensions",
       error:
         "The Symbol frame contains more than one Symbol Export Layer named 'Symbol'",
     });
 
   if (frame.width < 24 || frame.height < 24)
     errors.push({
-      category: "Frame dimensions",
+      category: "Symbol Frame Dimensions",
       error: "The Symbol frame width and height must greater than 24px",
     });
 
   if (frame.height % 24 !== 0 || frame.width % 24 !== 0)
     errors.push({
-      category: "Frame dimensions",
+      category: "Symbol Frame Dimensions",
       error: "The Symbol frame width and height must be a multiple of 24",
     });
 

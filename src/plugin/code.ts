@@ -1,6 +1,7 @@
 import { createExportVectorFromNodeId } from "./createExportVector";
 import { exportAsSvg } from "./exportAsSvg";
 import { PluginAction, SelectionChangedMessage } from "./types";
+import { updateSymbolVectorNetwork } from "./updateSymbolVector";
 import { validateNodeAsSymbol, validateSelectionAsSymbol } from "./validation";
 
 type ShowUiOptionsExtended = ShowUIOptions & { themeColors: boolean };
@@ -35,6 +36,10 @@ figma.ui.onmessage = (msg: PluginAction) => {
       break;
     case "create-export-blob":
       exportAsSvg(msg.payload.nodeId);
+      break;
+    case "export-vector-network-updated":
+      updateSymbolVectorNetwork(msg.payload.symbolVectorData);
+      break;
     default:
       break;
   }
