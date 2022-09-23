@@ -1,12 +1,12 @@
 import { defineConfig } from "vite";
-import reactRefresh from "@vitejs/plugin-react-refresh";
+import react from "@vitejs/plugin-react";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import svgr from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   root: "./src/ui",
-  plugins: [svgr(), reactRefresh(), viteSingleFile()],
+  plugins: [svgr(), react(), viteSingleFile()],
   build: {
     emptyOutDir: true,
     target: "esnext",
@@ -15,10 +15,6 @@ export default defineConfig({
     cssCodeSplit: false,
     reportCompressedSize: false,
     outDir: "../../dist",
-    rollupOptions: {
-      output: {
-        manualChunks: () => "everything.js",
-      },
-    },
+    rollupOptions: {},
   },
 });
