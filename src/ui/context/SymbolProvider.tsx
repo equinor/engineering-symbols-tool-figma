@@ -23,6 +23,8 @@ export type SymbolContextProviderValue = {
   setSymbol: (symbol?: AnnotationSymbolUi) => void;
   validationErrors: ValidationError[];
   isValid: boolean;
+  createExportLayer: () => void;
+  canCreateExportLayer: boolean;
 };
 
 export const SymbolContext = createContext<SymbolContextProviderValue | null>(
@@ -88,6 +90,19 @@ export function SymbolContextProvider({
     }
   }
 
+  const createExportLayer = () => {
+    if (symbol === undefined || symbol.id === undefined) return;
+    postMessageToPlugin({
+      type: "create-export-vector",
+      payload: { nodeId: symbol.id },
+    });
+  };
+
+  const canCreateExportLayer =
+    (validationErrors.length === 1 &&
+      validationErrors[0].category === "Export Layer Fill Rule") ||
+    isValid;
+
   useEffect(() => {
     if (!symbol?.id) return;
     const validateInterval = setInterval(() => {
@@ -95,7 +110,7 @@ export function SymbolContextProvider({
         type: "validate-node-as-symbol",
         payload: { nodeId: symbol.id },
       });
-    }, 3000);
+    }, 200);
 
     return () => {
       clearInterval(validateInterval);
@@ -112,7 +127,14 @@ export function SymbolContextProvider({
 
   return (
     <SymbolContext.Provider
-      value={{ symbol, setSymbol, validationErrors, isValid }}>
+      value={{
+        symbol,
+        setSymbol,
+        validationErrors,
+        isValid,
+        createExportLayer,
+        canCreateExportLayer,
+      }}>
       {children}
     </SymbolContext.Provider>
   );

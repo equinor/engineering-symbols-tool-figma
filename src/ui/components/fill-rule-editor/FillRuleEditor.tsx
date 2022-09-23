@@ -14,17 +14,21 @@ import {
 import { SymbolVectorData } from "../../../plugin/types";
 import { postMessageToPlugin } from "../../helpers/pluginHelpers";
 import { InvalidSelection } from "../invalid-selection";
+import { ErrorContent } from "../error-content";
 
 export function FillRuleEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { symbol, validationErrors, isValid } = useContext(
-    SymbolContext
-  ) as SymbolContextProviderValue;
+  const {
+    symbol,
+    validationErrors,
+    isValid,
+    createExportLayer,
+    canCreateExportLayer,
+  } = useContext(SymbolContext) as SymbolContextProviderValue;
 
   const onM = (nodeData: SymbolVectorData) => {
-    console.log("Got nodeData from fillrule:", nodeData);
     postMessageToPlugin({
       type: "export-vector-network-updated",
       payload: { symbolVectorData: nodeData },
@@ -57,7 +61,19 @@ export function FillRuleEditor() {
     draw(symbol?.symbolVectorData);
   }, [canvasRef.current]);
 
-  if (!symbol?.symbolVectorData) return <InvalidSelection />;
+  if (!symbol) return <InvalidSelection />;
+
+  if (!symbol?.symbolVectorData)
+    return (
+      <ErrorContent title="Export Layer not Created">
+        <button
+          className={canCreateExportLayer ? "brand" : "brand-disabled"}
+          disabled={!canCreateExportLayer}
+          onClick={() => createExportLayer()}>
+          Create Export Layer
+        </button>
+      </ErrorContent>
+    );
 
   return (
     <div ref={containerRef} id="container" className="explore">

@@ -7,6 +7,7 @@ import {
 } from "../../context/SymbolProvider";
 import { postMessageToPlugin } from "../../helpers/pluginHelpers";
 import { InvalidSelection } from "../invalid-selection";
+import { ErrorContent } from "../error-content";
 
 export function ExportTab() {
   const { symbol, validationErrors, isValid } = useContext(
@@ -47,10 +48,10 @@ export function ExportTab() {
         <div className="content">
           <h1>{symbol.name}</h1>
           <p>
-            <span className="secondary-color ">W</span>&nbsp;&nbsp;{" "}
-            {symbol.width} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span className="secondary-color ">H</span>&nbsp;&nbsp;{" "}
-            {symbol.width}
+            <span className="secondary-color ">W</span>&nbsp;&nbsp;
+            {symbol.width}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span className="secondary-color ">H</span>&nbsp;&nbsp;
+            {symbol.height}
           </p>
           {validationErrors.map((e) => {
             return (
@@ -83,7 +84,14 @@ export function ExportTab() {
   }
 
   if (validationErrors.some((e) => e.category === "Invalid Selection")) {
-    return <InvalidSelection />;
+    return (
+      <ErrorContent title="Invalid Selection">
+        <p>
+          Select a single Frame that contains two Groups: 'Design' and
+          'Annotations'
+        </p>
+      </ErrorContent>
+    );
   }
 
   return (

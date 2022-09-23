@@ -46,6 +46,14 @@ export function validateNodeAsSymbol(nodeId: string): void {
   figma.ui.postMessage(msg);
 }
 
+function findFirstParentFrame(
+  parent: (BaseNode & ChildrenMixin) | null
+): string | undefined {
+  if (!parent || parent.type === "PAGE") return undefined;
+  if (parent.type === "FRAME") return parent.id;
+  return findFirstParentFrame(parent.parent);
+}
+
 export function validateSymbol(
   nodes: ReadonlyArray<SceneNode>
 ): SymbolValidationResult {
@@ -55,10 +63,22 @@ export function validateSymbol(
       "Select a single Frame that contains two Groups: 'Design' and 'Annotations'",
   };
 
-  if (!(nodes.length == 1 && nodes[0].type == "FRAME"))
-    return { validationErrors: [selectionErrorMsg] };
+  let frame: FrameNode;
 
-  const frame = nodes[0];
+  if (nodes.length == 1 && nodes[0].type == "FRAME") {
+    frame = nodes[0];
+  } else {
+    // Search up in the tree
+    if (nodes.length > 0) {
+      const ancestorFrameId = findFirstParentFrame(nodes[0].parent);
+      frame = figma.currentPage.findOne(
+        (n) => n.id === ancestorFrameId
+      ) as FrameNode;
+      if (!frame) return { validationErrors: [selectionErrorMsg] };
+    } else {
+      return { validationErrors: [selectionErrorMsg] };
+    }
+  }
 
   const symbolGroups = frame.children.filter(
     (c) =>

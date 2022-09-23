@@ -5,32 +5,10 @@ import "./HelpTab.css";
 export function HelpTab() {
   return (
     <div className="help">
-      <h1>Help me</h1>
-      <p>Paragraph 1</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
-      <h1>Help me</h1>
-      <p>Paragraph 1</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
-      <h1>Help me</h1>
-      <p>Paragraph 1</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
-      <h1>Help me</h1>
-      <p>Paragraph 1</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
-      <h1>Help me</h1>
-      <p>Paragraph 1</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
-      <h1>Help me</h1>
-      <p>Paragraph 1</p>
-      <h1>Help moi</h1>
-      <p>Paragraph 2</p>
+      <h3>About</h3>
+      <p></p>
+      <h3>Steps</h3>
+      <p></p>
     </div>
   );
 }

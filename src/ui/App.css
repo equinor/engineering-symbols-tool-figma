@@ -104,3 +104,24 @@ svg {
 .secondary-color {
   color: var(--figma-color-text-secondary);
 }
+
+.styled-scrollbars {
+  scrollbar-width: 20px;
+  /* Foreground, Background */
+  scrollbar-color: var(--figma-color-bg-disabled-secondary) transparent;
+}
+.styled-scrollbars::-webkit-scrollbar {
+  width: 20px; /* Mostly for vertical scrollbars */
+  height: 20px; /* Mostly for horizontal scrollbars */
+  background-color: transparent;
+}
+.styled-scrollbars::-webkit-scrollbar-thumb {
+  width: 6px;
+  border-radius: 10px;
+  background-color: var(--figma-color-bg-disabled-secondary);
+}
+.styled-scrollbars::-webkit-scrollbar-track {
+  background-color: transparent;
+  width: 15px; /* Mostly for vertical scrollbars */
+  height: 15px; /* Mostly for horizontal scrollbars */
+}
