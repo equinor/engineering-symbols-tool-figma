@@ -12,20 +12,28 @@ let hoverEvenoddColor = evenoddColor;
 let geometryColor = "#777";
 let hoverGeometryColor = "#000";
 
-const minCanvasSize = 400;
-let canvasSize = minCanvasSize;
-let cScale = 1;
+const canvasWidthMin = 450;
+const canvasHeightMin = 410;
+
+let canvasWidth = canvasWidthMin;
+let canvasHeight = canvasHeightMin;
+
+let zoomScale = 1;
+let zoomPoint = null;
+
+let holdingCtrlKey = false;
 
 let onNodeMutated = (nodeData) => {
   throw new Error("Callback 'onNodeMutated' not set!");
 };
 
-const onMouseMove = ({ target, clientX, clientY }) => {
+const onMouseMove = ({ target, clientX, clientY, ctrlKey, metaKey }) => {
+  if (holdingCtrlKey) return;
   // Get the bounding rectangle of target
   const rect = target.getBoundingClientRect();
 
-  const x = ((clientX - rect.left) / canvas.width) * canvasSize;
-  const y = ((clientY - rect.top) / canvas.height) * canvasSize;
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
 
   hover = hitTest({ x: x, y: y });
 
@@ -35,8 +43,8 @@ const onMouseMove = ({ target, clientX, clientY }) => {
 const onMouseDown = ({ target, clientX, clientY }) => {
   const rect = target.getBoundingClientRect();
 
-  const x = ((clientX - rect.left) / canvas.width) * canvasSize;
-  const y = ((clientY - rect.top) / canvas.height) * canvasSize;
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
   hover = hitTest({ x: x, y: y });
 
   if (hover && hover.type === "loop") {
@@ -55,16 +63,47 @@ const onMouseDown = ({ target, clientX, clientY }) => {
 };
 
 const onWheel = (e) => {
-  if (!(e.ctrlKey || e.metaKey)) return;
+  if (!holdingCtrlKey) return;
   e.preventDefault();
-  const delta = e.deltaY < 0 ? 50 : -50;
-  if (canvasSize + delta < minCanvasSize) return;
-  canvasSize += delta;
+
+  const delta = e.deltaY < 0 ? 0.3 : -0.3;
+
+  const newScale = zoomScale + delta;
+
+  if (newScale > 5) zoomScale = 5;
+  else if (newScale < 1) zoomScale = 1;
+  else zoomScale += delta;
+
+  canvasWidth = canvasWidthMin * zoomScale;
+  canvasHeight = canvasHeightMin * zoomScale;
+
+  if (zoomPoint == null) zoomPoint = { x: e.clientX, y: e.clientY };
+
+  const cx = zoomPoint.x / canvasWidthMin;
+  const cy = zoomPoint.y / canvasHeightMin;
+
+  container.scrollLeft = canvasWidth * cx - canvasWidthMin * cx;
+  container.scrollTop = canvasHeight * cy - canvasHeightMin * cy;
+
   draw();
 };
 
+const onCtrlAndMetaKeyDown = (e) => {
+  console.log("down");
+  if (!(e.ctrlKey || e.metaKey)) return;
+  holdingCtrlKey = true;
+};
+
+const onKeyup = (e) => {
+  console.log(e);
+  if (!(e.key === "Control" || e.key === "Meta")) return;
+  console.log("up2");
+  holdingCtrlKey = false;
+  zoomPoint = null;
+};
+
 export function updateNode(nodeData) {
-  if (!canvas || !c || !container) return;
+  if (!canvas || !c || !container || holdingCtrlKey) return;
   node = nodeData;
   hover = prevMouse ? hitTest(prevMouse) : null;
   draw();
@@ -93,8 +132,12 @@ export function setContainer(ct) {
   if (!ct) return;
   if (container) {
     container.removeEventListener("wheel", onWheel);
+    window.removeEventListener("keydown", onCtrlAndMetaKeyDown);
+    window.removeEventListener("keyup", onKeyup);
   }
   container = ct;
+  window.addEventListener("keydown", onCtrlAndMetaKeyDown);
+  window.addEventListener("keyup", onKeyup);
   container.addEventListener("wheel", onWheel);
 }
 
@@ -253,22 +296,18 @@ function createTransformers(network) {
     bb.includePoint(ex + te.x, ey + te.y);
   }
 
-  const adjustedHeight = canvasSize - 0; //innerHeight - 100;
-
   const cx = (bb.xmin + bb.xmax) / 2;
   const cy = (bb.ymin + bb.ymax) / 2;
   const scale = Math.min(
-    (canvasSize - 40) / (bb.xmax - bb.xmin || 1),
-    (adjustedHeight - 40) / (bb.ymax - bb.ymin || 1)
+    (canvasWidth - 50) / (bb.xmax - bb.xmin || 1),
+    (canvasHeight - 50) / (bb.ymax - bb.ymin || 1)
   );
 
-  cScale = scale;
-
   function tx(x) {
-    return canvasSize / 2 + (x - cx) * scale;
+    return canvasWidth / 2 + (x - cx) * scale;
   }
   function ty(y) {
-    return adjustedHeight / 2 + (y - cy) * scale;
+    return canvasHeight / 2 + (y - cy) * scale;
   }
   function t({ x, y }) {
     return { x: tx(x), y: ty(y) };
@@ -279,8 +318,8 @@ function createTransformers(network) {
 
 function draw() {
   const ratio = 1; //devicePixelRatio;
-  canvas.width = Math.round(ratio * canvasSize);
-  canvas.height = Math.round(ratio * canvasSize);
+  canvas.width = Math.round(ratio * canvasWidth);
+  canvas.height = Math.round(ratio * canvasHeight);
   c.scale(ratio, ratio);
 
   if (!node) {
