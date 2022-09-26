@@ -22,13 +22,27 @@ let zoomScale = 1;
 let zoomPoint = null;
 
 let holdingCtrlKey = false;
+let holdingSpaceKey = false;
+let mouseLeftDown = false;
+
+let dragPoint = null;
 
 let onNodeMutated = (nodeData) => {
   throw new Error("Callback 'onNodeMutated' not set!");
 };
 
-const onMouseMove = ({ target, clientX, clientY, ctrlKey, metaKey }) => {
-  if (holdingCtrlKey) return;
+const onMouseMove = ({ target, clientX, clientY }) => {
+  if (holdingSpaceKey && mouseLeftDown) {
+    container.style.cursor = "grabbing";
+    const dx = clientX - dragPoint.x;
+    const dy = clientY - dragPoint.y;
+
+    // Scroll
+    container.scrollTop = dragPoint.top - dy;
+    container.scrollLeft = dragPoint.left - dx;
+    return;
+  }
+  if (holdingCtrlKey || holdingSpaceKey) return;
   // Get the bounding rectangle of target
   const rect = target.getBoundingClientRect();
 
@@ -41,6 +55,16 @@ const onMouseMove = ({ target, clientX, clientY, ctrlKey, metaKey }) => {
 };
 
 const onMouseDown = ({ target, clientX, clientY }) => {
+  mouseLeftDown = true;
+  if (holdingSpaceKey) {
+    dragPoint = {
+      left: container.scrollLeft,
+      top: container.scrollTop,
+      x: clientX,
+      y: clientY,
+    };
+    return;
+  }
   const rect = target.getBoundingClientRect();
 
   const x = clientX - rect.left;
@@ -60,6 +84,10 @@ const onMouseDown = ({ target, clientX, clientY }) => {
   }
 
   draw();
+};
+
+const onMouseUp = () => {
+  mouseLeftDown = false;
 };
 
 const onWheel = (e) => {
@@ -88,22 +116,32 @@ const onWheel = (e) => {
   draw();
 };
 
-const onCtrlAndMetaKeyDown = (e) => {
-  console.log("down");
-  if (!(e.ctrlKey || e.metaKey)) return;
-  holdingCtrlKey = true;
+const onKeyDown = (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    holdingCtrlKey = true;
+    return;
+  }
+  if (e.code === "Space") {
+    holdingSpaceKey = true;
+    container.style.cursor = "grab";
+  }
 };
 
 const onKeyup = (e) => {
-  console.log(e);
-  if (!(e.key === "Control" || e.key === "Meta")) return;
-  console.log("up2");
-  holdingCtrlKey = false;
-  zoomPoint = null;
+  if (e.key === "Control" || e.key === "Meta") {
+    holdingCtrlKey = false;
+    zoomPoint = null;
+    return;
+  }
+
+  if (e.code === "Space") {
+    holdingSpaceKey = false;
+    container.style.cursor = "default";
+  }
 };
 
 export function updateNode(nodeData) {
-  if (!canvas || !c || !container || holdingCtrlKey) return;
+  if (!canvas || !c || !container || holdingCtrlKey || holdingSpaceKey) return;
   node = nodeData;
   hover = prevMouse ? hitTest(prevMouse) : null;
   draw();
@@ -114,6 +152,7 @@ export function setCanvas(cv) {
   if (canvas) {
     canvas.removeEventListener("mousemove", onMouseMove);
     canvas.removeEventListener("mousedown", onMouseDown);
+    canvas.removeEventListener("mouseup", onMouseUp);
   }
   canvas = cv;
   c = canvas.getContext("2d");
@@ -122,6 +161,7 @@ export function setCanvas(cv) {
   // createDiagonalPattern(evenoddColor, (x) => (evenoddColor = x));
   canvas.addEventListener("mousemove", onMouseMove);
   canvas.addEventListener("mousedown", onMouseDown);
+  canvas.addEventListener("mouseup", onMouseUp);
 }
 
 export function setOnNodeMutatedCallback(callback) {
@@ -132,11 +172,11 @@ export function setContainer(ct) {
   if (!ct) return;
   if (container) {
     container.removeEventListener("wheel", onWheel);
-    window.removeEventListener("keydown", onCtrlAndMetaKeyDown);
+    window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("keyup", onKeyup);
   }
   container = ct;
-  window.addEventListener("keydown", onCtrlAndMetaKeyDown);
+  window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyup);
   container.addEventListener("wheel", onWheel);
 }
