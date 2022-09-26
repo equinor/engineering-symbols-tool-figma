@@ -1,0 +1,41 @@
+.symbolContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - var(--nav-height));
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.error-item {
+  border: 2px solid var(--figma-color-border-ondanger, #e5e5e5);
+  border-radius: 6px;
+  text-align: left;
+  padding: 10px;
+  margin: 0 25px;
+  background: var(--figma-color-bg-danger);
+  color: var(--figma-color-text-ondanger);
+}
+
+.error-item h4 {
+  /* line-height: 5px; */
+  margin: 0 0 5px 0;
+}
+
+.error-item p {
+  /* line-height: 5px; */
+  margin: 0;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  height: 70px;
+  border-top: 1px solid var(--color-border, #e5e5e5);
+}

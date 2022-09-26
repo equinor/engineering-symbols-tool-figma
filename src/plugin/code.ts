@@ -1,29 +1,41 @@
-import { createExportVector } from "./createExportVector";
-import { PluginAction } from "./types";
-import { validateSelectionAsSymbol } from "./validation";
+import { createExportVectorFromNodeIdOrNodes } from "./createExportVector";
+import { exportAsSvg } from "./exportAsSvg";
+import { PluginAction, SelectionChangedMessage } from "./types";
+import { updateSymbolVectorNetwork } from "./updateSymbolVector";
+import { validateNodeAsSymbol, validateSelectionAsSymbol } from "./validation";
 
 type ShowUiOptionsExtended = ShowUIOptions & { themeColors: boolean };
 
+function getSelectionChangedUiMsg(): SelectionChangedMessage {
+  return {
+    type: "selection-changed",
+    payload: { selection: figma.currentPage.selection },
+  };
+}
+
 figma.showUI(__html__, {
   title: "Engineering Symbols Tool",
-  height: 300,
+  height: 450,
+  width: 450,
   themeColors: true,
 } as ShowUiOptionsExtended);
 
-figma.ui.postMessage({
-  pluginMessage: { newSelection: figma.currentPage.selection },
-});
-
 figma.ui.onmessage = (msg: PluginAction) => {
   switch (msg.type) {
-    case "create-symbol":
-      break;
-
     case "create-export-vector":
-      createExportVector(figma.currentPage.selection);
+      createExportVectorFromNodeIdOrNodes(msg.payload.nodeId);
       break;
     case "validate-selection-as-symbol":
       validateSelectionAsSymbol(figma.currentPage.selection);
+      break;
+    case "validate-node-as-symbol":
+      validateNodeAsSymbol(msg.payload.nodeId);
+      break;
+    case "create-export-blob":
+      exportAsSvg(msg.payload.nodeId);
+      break;
+    case "export-vector-network-updated":
+      updateSymbolVectorNetwork(msg.payload.symbolVectorData);
       break;
     default:
       break;
@@ -31,8 +43,7 @@ figma.ui.onmessage = (msg: PluginAction) => {
 };
 
 figma.on("selectionchange", () => {
-  console.log(figma.currentPage.selection);
-  figma.ui.postMessage({
-    pluginMessage: { newSelection: figma.currentPage.selection },
-  });
+  figma.ui.postMessage(getSelectionChangedUiMsg());
 });
+
+figma.ui.postMessage(getSelectionChangedUiMsg());

@@ -12,16 +12,15 @@
   --color-border-brand: var(--figma-color-border-brand);
   --color-border-brand-focus: var(--figma-color-border-selected-strong);
   --color-text-brand: var(--figma-color-text-onbrand);
+
+  --nav-height: 40px;
+  --content-height: calc(100vh - var(--nav-height));
 }
 
 html,
 body,
 main {
   height: 100%;
-}
-
-header {
-  background: "red";
 }
 
 body,
@@ -31,19 +30,32 @@ button {
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 1rem;
   text-align: center;
+
+  font-style: normal;
+  font-variant-ligatures: normal;
+  font-variant-caps: normal;
+  font-variant-numeric: normal;
+  font-variant-east-asian: normal;
+  font-weight: 400;
+  font-stretch: normal;
+  font-size: 12px;
+  line-height: 16px;
+  font-family: Inter, sans-serif;
+  color: var(--color-text, #333333);
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-text);
   margin: 0;
+  overflow: hidden;
 }
 
 button {
   border-radius: 0.25rem;
   background: var(--color-bg);
   color: var(--color-text);
-  cursor: pointer;
+  /* cursor: default; */
   border: 1px solid var(--color-border);
   padding: 0.5rem 1rem;
 }
@@ -69,22 +81,8 @@ button.brand {
   --color-border: transparent;
   --color-border-focus: var(--color-border-brand-focus);
 }
-
-button.nav {
-  padding: 2px 4px;
-  font-size: 12px;
-  font-weight: 500;
-  --color-bg: transparent;
-  --color-text: var(--figma-color-text-secondary);
+button.brand-disabled:hover {
   --color-bg-hover: transparent;
-  --color-bg-active: transparent;
-  --color-border: transparent;
-  --color-border-focus: transparent;
-}
-
-button.nav.active {
-  font-weight: 600;
-  --color-text: var(--color-text);
 }
 
 input {
@@ -103,24 +101,27 @@ svg {
   stroke: var(--color-icon, rgba(0, 0, 0, 0.9));
 }
 
-main {
-  //align-items: center;
-  display: grid;
-  grid-template-rows: [nav] 50px [content] auto;
-  height: 100%;
-  //background: red;
+.secondary-color {
+  color: var(--figma-color-text-secondary);
 }
 
-nav {
-  grid-area: [nav];
-  //background: green;
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  border-bottom: 1px solid var(--color-border, #e5e5e5);
+.styled-scrollbars {
+  scrollbar-width: 20px;
+  /* Foreground, Background */
+  scrollbar-color: var(--figma-color-bg-disabled-secondary) transparent;
 }
-
-section {
-  grid-area: [content];
-  //background: yellow;
+.styled-scrollbars::-webkit-scrollbar {
+  width: 20px; /* Mostly for vertical scrollbars */
+  height: 20px; /* Mostly for horizontal scrollbars */
+  background-color: transparent;
+}
+.styled-scrollbars::-webkit-scrollbar-thumb {
+  width: 6px;
+  border-radius: 10px;
+  background-color: var(--figma-color-bg-disabled-secondary);
+}
+.styled-scrollbars::-webkit-scrollbar-track {
+  background-color: transparent;
+  width: 15px; /* Mostly for vertical scrollbars */
+  height: 15px; /* Mostly for horizontal scrollbars */
 }
