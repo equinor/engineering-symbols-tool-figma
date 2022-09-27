@@ -23,6 +23,7 @@ export async function exportAsSvg(nodeId: string) {
     format: "SVG",
     svgIdAttribute: true,
     contentsOnly: true,
+    svgSimplifyStroke: false,
   });
 
   for (let i = 0; i < node.children.length; i++) {

@@ -98,7 +98,8 @@ export type AnnotationSymbol = {
 export type ValidationErrorCategory =
   | "Export Layer Fill Rule"
   | "Symbol Frame Dimensions"
-  | "Invalid Selection";
+  | "Invalid Selection"
+  | "Design Group";
 
 export type ValidationError = {
   category: ValidationErrorCategory;
@@ -122,3 +123,32 @@ export interface SymbolConnector {
   relativePosition: { x: number; y: number };
   direction: number;
 }
+
+// export type ValidNode<TSceneNode extends SceneNode> = TSceneNode["type"];
+
+// export type ValidNode1<TSceneNode extends SceneNode> = TSceneNode;
+
+// export type SupportedNodeType = LineNode | RectangleNode | VectorNode;
+
+// export const SupportedNodeTypes = ["VECTOR", "LINE", "RECTANGLE"] as const;
+
+// export type SupportedNodeType = {
+//   type: typeof SupportedNodeTypes[number];
+// } & SceneNode;
+
+export const SupportedNodeTypes: readonly SceneNode["type"][] = [
+  "LINE",
+  "RECTANGLE",
+  "ELLIPSE",
+  "POLYGON",
+  "VECTOR",
+] as const;
+
+export type SupportedNodeType =
+  | LineNode
+  | RectangleNode
+  | EllipseNode
+  | PolygonNode
+  | VectorNode;
+
+export type NodeId = string;

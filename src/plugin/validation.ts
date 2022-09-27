@@ -2,6 +2,7 @@ import { designGroupName } from "./constants";
 import {
   AnnotationSymbol,
   AnnotationSymbolUi,
+  SupportedNodeTypes,
   SymbolValidationResult,
   UiMessage,
   ValidationError,
@@ -80,13 +81,13 @@ export function validateSymbol(
     }
   }
 
-  const symbolGroups = frame.children.filter(
+  const designGroups = frame.children.filter(
     (c) =>
       c.name.toLowerCase() === designGroupName.toLowerCase() &&
       c.type === "GROUP"
   ) as GroupNode[];
 
-  if (symbolGroups.length != 1)
+  if (designGroups.length != 1)
     return { validationErrors: [selectionErrorMsg] };
 
   const annotationsGroups = frame.children.filter(
@@ -101,9 +102,22 @@ export function validateSymbol(
   const symbol: AnnotationSymbol = {
     id: frame.id,
     mainFrame: frame,
-    designGroup: symbolGroups[0],
+    designGroup: designGroups[0],
     annotationsGroup: annotationsGroups[0],
   };
+
+  // Check if design group has illegal nodes
+  const illegalDesignNodes = designGroups[0].children.filter(
+    (c) => SupportedNodeTypes.indexOf(c.type) === -1
+  );
+
+  if (illegalDesignNodes.length > 0) {
+    const str = illegalDesignNodes.map((n) => n.type).join(", ");
+    errors.push({
+      category: "Design Group",
+      error: "The 'Design Group' contains illegal element(s): " + str,
+    });
+  }
 
   const symbolVectors = frame.children.filter(
     (c) => c.name.toLowerCase() === "symbol" && c.type === "VECTOR"
