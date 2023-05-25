@@ -19,21 +19,21 @@
     "dev": "concurrently -n tsc,build,vite 'npm:tsc:watch' 'npm:build:watch' 'vite'"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^2.1.0",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0",
-    "vite-plugin-svgr": "^2.2.1"
+    "@vitejs/plugin-react": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "vite-plugin-svgr": "^3.2.0"
   },
   "devDependencies": {
     "@figma/plugin-typings": "*",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "concurrently": "^7.4.0",
-    "esbuild": "^0.15.9",
-    "prettier": "^2.3.2",
-    "typescript": "^4.8.3",
-    "vite": "^3.1.3",
-    "vite-plugin-singlefile": "^0.12.1",
-    "vite-svg-loader": "^3.3.0"
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "concurrently": "^8.0.0",
+    "esbuild": "^0.17.19",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8",
+    "vite-plugin-singlefile": "^0.13.5",
+    "vite-svg-loader": "^4.0.0"
   }
 }
