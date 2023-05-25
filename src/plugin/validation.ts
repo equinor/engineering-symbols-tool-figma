@@ -8,6 +8,8 @@ import {
   ValidationError,
 } from "./types";
 
+const BASE_SIZE: Readonly<number> = 12;
+
 function AnnotationSymbolToUi(symbol: AnnotationSymbol): AnnotationSymbolUi {
   return {
     id: symbol.id,
@@ -152,16 +154,16 @@ export function validateSymbol(
         "The Symbol frame contains more than one Symbol Export Layer named 'Symbol'",
     });
 
-  if (frame.width < 24 || frame.height < 24)
+  if (frame.width < BASE_SIZE || frame.height < BASE_SIZE)
     errors.push({
       category: "Symbol Frame Dimensions",
-      error: "The Symbol frame width and height must greater than 24px",
+      error: `The Symbol frame width and height must be equal or greater than ${BASE_SIZE}px`,
     });
 
-  if (frame.height % 24 !== 0 || frame.width % 24 !== 0)
+  if (frame.height % BASE_SIZE !== 0 || frame.width % BASE_SIZE !== 0)
     errors.push({
       category: "Symbol Frame Dimensions",
-      error: "The Symbol frame width and height must be a multiple of 24",
+      error: `The Symbol frame width and height must be a multiple of ${BASE_SIZE}`,
     });
 
   return {
