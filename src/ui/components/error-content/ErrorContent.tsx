@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import "./ErrorContent.css";
-import { ReactComponent as Warning } from "./Warning.svg";
+import Warning from "./Warning.svg?react";
 
 export type ErrorContentProps = {
   title: string;

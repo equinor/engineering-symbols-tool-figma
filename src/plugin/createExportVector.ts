@@ -1,5 +1,4 @@
 import {
-  AnnotationSymbol,
   NodeId,
   SupportedNodeType,
   SupportedNodeTypes,
@@ -34,11 +33,11 @@ function handleValidation(validationResult: SymbolValidationResult) {
 
   if (validationResult.validationErrors.length > 0 && !onlyFillRuleError) {
     return undefined;
-  } else if (!validationResult.annotationSymbol) {
+  } else if (!validationResult.symbol) {
     figma.notify("Unknown error occurred!", { error: true });
     return undefined;
   }
-  return validationResult.annotationSymbol;
+  return validationResult.symbol;
 }
 
 function createExportVector(mainFrame: FrameNode, designGroup: GroupNode) {

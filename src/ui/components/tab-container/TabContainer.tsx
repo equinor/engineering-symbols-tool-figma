@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import "./TabContainer.css";
 import { ExportTab } from "../export-tab";
 import { TemplateTab } from "../template-tab";
@@ -14,7 +14,7 @@ export function TabContainer() {
   const [tabs, setTabs] = useState<Tab[]>([
     { name: "Export", active: true },
     { name: "Fill Rule Editor", active: false },
-    { name: "Templates", active: false },
+    //{ name: "Templates", active: false },
     { name: "Help", active: false },
   ]);
 
@@ -34,7 +34,8 @@ export function TabContainer() {
           return (
             <button
               className={tab.active ? "nav active" : "nav"}
-              onClick={() => onNavBtnClick(tab)}>
+              onClick={() => onNavBtnClick(tab)}
+            >
               {tab.name}
             </button>
           );

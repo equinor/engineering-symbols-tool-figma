@@ -1,23 +1,22 @@
 import { designGroupName } from "./constants";
 import {
-  AnnotationSymbol,
-  AnnotationSymbolUi,
+  EsSymbol,
+  EsSymbolUi,
   SupportedNodeTypes,
   SymbolValidationResult,
   UiMessage,
   ValidationError,
 } from "./types";
 
-const BASE_SIZE: Readonly<number> = 12;
+const BASE_SIZE: Readonly<number> = 1;
 
-function AnnotationSymbolToUi(symbol: AnnotationSymbol): AnnotationSymbolUi {
+function AnnotationSymbolToUi(symbol: EsSymbol): EsSymbolUi {
   return {
     id: symbol.id,
     name: symbol.mainFrame.name,
     width: symbol.mainFrame.width,
     height: symbol.mainFrame.height,
     designGroupId: symbol.designGroup.id,
-    annotationGroupId: symbol.annotationsGroup.id,
     symbolVectorData: symbol.symbolVectorData,
   };
 }
@@ -26,9 +25,7 @@ function getValidationUiMessage(result: SymbolValidationResult): UiMessage {
   return {
     type: "symbol-validation-result",
     payload: {
-      symbol: result.annotationSymbol
-        ? AnnotationSymbolToUi(result.annotationSymbol)
-        : undefined,
+      symbol: result.symbol ? AnnotationSymbolToUi(result.symbol) : undefined,
       validationErrors: result.validationErrors,
     },
   };
@@ -62,8 +59,8 @@ export function validateSymbol(
 ): SymbolValidationResult {
   const selectionErrorMsg: ValidationError = {
     category: "Invalid Selection",
-    error:
-      "Select a single Frame that contains two Groups: 'Design' and 'Annotations'",
+    error: "Select a single Frame that contains a Group named 'Design'",
+    //"Select a single Frame that contains two Groups: 'Design' and 'Annotations'",
   };
 
   let frame: FrameNode;
@@ -92,20 +89,12 @@ export function validateSymbol(
   if (designGroups.length != 1)
     return { validationErrors: [selectionErrorMsg] };
 
-  const annotationsGroups = frame.children.filter(
-    (c) => c.name.toLowerCase() === "annotations" && c.type === "GROUP"
-  ) as GroupNode[];
-
-  if (annotationsGroups.length != 1)
-    return { validationErrors: [selectionErrorMsg] };
-
   const errors: ValidationError[] = [];
 
-  const symbol: AnnotationSymbol = {
+  const symbol: EsSymbol = {
     id: frame.id,
     mainFrame: frame,
     designGroup: designGroups[0],
-    annotationsGroup: annotationsGroups[0],
   };
 
   // Check if design group has illegal nodes
@@ -167,7 +156,7 @@ export function validateSymbol(
     });
 
   return {
-    annotationSymbol: symbol,
+    symbol,
     validationErrors: errors,
   };
 }

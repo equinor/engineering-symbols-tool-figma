@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { AnnotationSymbol, PluginAction } from "../../../plugin/types";
+import React from "react";
+import { EsSymbol, PluginAction } from "../../../plugin/types";
 
 import "./TemplateTab.css";
 

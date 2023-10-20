@@ -5,7 +5,7 @@ export async function exportAsSvg(nodeId: string) {
 
   if (!node) return;
 
-  const exportNodes = ["symbol", "annotations"];
+  const exportNodes = ["symbol"];
 
   const originalVisibility: boolean[] = [];
 

@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./ExportTab.css";
-import { CreateExportVectorAction, PluginAction } from "../../../plugin/types";
 import {
   SymbolContext,
   SymbolContextProviderValue,
 } from "../../context/SymbolProvider";
 import { postMessageToPlugin } from "../../helpers/pluginHelpers";
-import { InvalidSelection } from "../invalid-selection";
 import { ErrorContent } from "../error-content";
 
 export function ExportTab() {
@@ -17,7 +15,6 @@ export function ExportTab() {
   const [canExport, setCanExport] = useState(false);
 
   useEffect(() => {
-    //console.log("symbol?.symbolVectorData", symbol?.symbolVectorData);
     setCanExport(symbol?.symbolVectorData !== undefined && isValid);
   }, [symbol?.symbolVectorData, isValid]);
 
@@ -66,7 +63,8 @@ export function ExportTab() {
           <button
             className={canCreateExportSymbol ? "brand" : "brand-disabled"}
             disabled={!canCreateExportSymbol}
-            onClick={() => onCreate()}>
+            onClick={() => onCreate()}
+          >
             {symbol.symbolVectorData
               ? "Re-Create Export Layer"
               : "Create Export Layer"}
@@ -75,7 +73,8 @@ export function ExportTab() {
           <button
             className={canExport ? "brand" : "brand-disabled"}
             disabled={!canExport}
-            onClick={() => onExportAsSvg()}>
+            onClick={() => onExportAsSvg()}
+          >
             Export As SVG
           </button>
         </div>
@@ -86,10 +85,7 @@ export function ExportTab() {
   if (validationErrors.some((e) => e.category === "Invalid Selection")) {
     return (
       <ErrorContent title="Invalid Selection">
-        <p>
-          Select a single Frame that contains two Groups: 'Design' and
-          'Annotations'
-        </p>
+        <p>Select a single Frame that contains a Group named 'Design'</p>
       </ErrorContent>
     );
   }

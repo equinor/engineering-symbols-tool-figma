@@ -59,7 +59,7 @@ export type SelectionChangedMessage = UiMessageBase<
 
 export type SymbolValidationResultMessage = UiMessageBase<
   "symbol-validation-result",
-  { validationErrors: ValidationError[]; symbol?: AnnotationSymbolUi }
+  { validationErrors: ValidationError[]; symbol?: EsSymbolUi }
 >;
 
 export type ExportAsSvgMessage = UiMessageBase<
@@ -77,21 +77,19 @@ export type SymbolVectorData = {
   vectorNetwork: VectorNetwork;
 };
 
-export type AnnotationSymbolUi = {
+export type EsSymbolUi = {
   id: string;
   name: string;
   width: number;
   height: number;
   designGroupId: string;
-  annotationGroupId: string;
   symbolVectorData?: SymbolVectorData;
 };
 
-export type AnnotationSymbol = {
+export type EsSymbol = {
   id: string;
   mainFrame: FrameNode;
   designGroup: GroupNode;
-  annotationsGroup: GroupNode;
   symbolVectorData?: SymbolVectorData;
 };
 
@@ -107,34 +105,9 @@ export type ValidationError = {
 };
 
 export type SymbolValidationResult = {
-  annotationSymbol?: AnnotationSymbol;
+  symbol?: EsSymbol;
   validationErrors: ValidationError[];
 };
-
-export interface ConnectorSymbol {
-  id: string;
-  width: number;
-  height: number;
-  connectors: SymbolConnector[];
-}
-
-export interface SymbolConnector {
-  id: string;
-  relativePosition: { x: number; y: number };
-  direction: number;
-}
-
-// export type ValidNode<TSceneNode extends SceneNode> = TSceneNode["type"];
-
-// export type ValidNode1<TSceneNode extends SceneNode> = TSceneNode;
-
-// export type SupportedNodeType = LineNode | RectangleNode | VectorNode;
-
-// export const SupportedNodeTypes = ["VECTOR", "LINE", "RECTANGLE"] as const;
-
-// export type SupportedNodeType = {
-//   type: typeof SupportedNodeTypes[number];
-// } & SceneNode;
 
 export const SupportedNodeTypes: readonly SceneNode["type"][] = [
   "LINE",

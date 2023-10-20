@@ -1,16 +1,8 @@
-import React, {
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import {
-  AnnotationSymbol,
-  AnnotationSymbolUi,
+  EsSymbolUi,
   PluginAction,
   UiMessage,
-  ValidateSelectionAsSymbolAction,
   ValidationError,
 } from "../../plugin/types";
 import { postMessageToPlugin } from "../helpers/pluginHelpers";
@@ -19,8 +11,8 @@ import { saveBlob } from "../helpers/saveBlob";
 type SymbolContextProviderProps = { children: React.ReactNode };
 
 export type SymbolContextProviderValue = {
-  symbol?: AnnotationSymbolUi;
-  setSymbol: (symbol?: AnnotationSymbolUi) => void;
+  symbol?: EsSymbolUi;
+  setSymbol: (symbol?: EsSymbolUi) => void;
   validationErrors: ValidationError[];
   isValid: boolean;
   createExportLayer: () => void;
@@ -34,7 +26,7 @@ export const SymbolContext = createContext<SymbolContextProviderValue | null>(
 export function SymbolContextProvider({
   children,
 }: SymbolContextProviderProps) {
-  const [symbol, _setSymbol] = useState<AnnotationSymbolUi>();
+  const [symbol, _setSymbol] = useState<EsSymbolUi>();
   const [validationErrors, _setValidationErrors] = useState<ValidationError[]>(
     []
   );
@@ -42,7 +34,7 @@ export function SymbolContextProvider({
   const symbolRef = useRef(symbol);
   const validationErrorsRef = useRef(validationErrors);
 
-  const setSymbol = (symbol?: AnnotationSymbolUi) => {
+  const setSymbol = (symbol?: EsSymbolUi) => {
     symbolRef.current = symbol;
     _setSymbol(symbolRef.current);
   };
@@ -134,7 +126,8 @@ export function SymbolContextProvider({
         isValid,
         createExportLayer,
         canCreateExportLayer,
-      }}>
+      }}
+    >
       {children}
     </SymbolContext.Provider>
   );
