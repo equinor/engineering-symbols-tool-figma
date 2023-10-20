@@ -3,7 +3,8 @@ export type PluginActionType =
   | "create-export-blob"
   | "export-vector-network-updated"
   | "validate-selection-as-symbol"
-  | "validate-node-as-symbol";
+  | "validate-node-as-symbol"
+  | "request-preview";
 
 export type PluginActionBase<TActionType extends PluginActionType, TPayload> = {
   type: TActionType;
@@ -22,7 +23,7 @@ export type CreateExportBlobAction = PluginActionBase<
 
 export type ExportVectorNetworkUpdatedAction = PluginActionBase<
   "export-vector-network-updated",
-  { symbolVectorData: SymbolVectorData }
+  { nodeId: string; symbolVectorData: SymbolVectorData }
 >;
 
 export type ValidateSelectionAsSymbolAction = PluginActionBase<
@@ -35,17 +36,24 @@ export type ValidateNodeAsSymbolAction = PluginActionBase<
   { nodeId: string }
 >;
 
+export type RequestPreviewAction = PluginActionBase<
+  "request-preview",
+  { nodeId: string }
+>;
+
 export type PluginAction =
   | ValidateNodeAsSymbolAction
   | ValidateSelectionAsSymbolAction
   | CreateExportVectorAction
   | CreateExportBlobAction
-  | ExportVectorNetworkUpdatedAction;
+  | ExportVectorNetworkUpdatedAction
+  | RequestPreviewAction;
 
 export type UiMessageType =
   | "selection-changed"
   | "symbol-validation-result"
-  | "export-as-svg";
+  | "export-as-svg"
+  | "symbol-preview";
 
 export type UiMessageBase<TMessageType extends UiMessageType, TPayload> = {
   type: TMessageType;
@@ -67,10 +75,16 @@ export type ExportAsSvgMessage = UiMessageBase<
   { uInt8Array: Uint8Array; fileName: string }
 >;
 
+export type SymbolPreviewMessage = UiMessageBase<
+  "symbol-preview",
+  { svgString: string }
+>;
+
 export type UiMessage =
   | SelectionChangedMessage
   | SymbolValidationResultMessage
-  | ExportAsSvgMessage;
+  | ExportAsSvgMessage
+  | SymbolPreviewMessage;
 
 export type SymbolVectorData = {
   id: string;

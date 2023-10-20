@@ -1,4 +1,5 @@
 import { createExportVectorFromNodeIdOrNodes } from "./createExportVector";
+import { createPreviewBlob } from "./createPreviewBlob";
 import { exportAsSvg } from "./exportAsSvg";
 import { PluginAction, SelectionChangedMessage } from "./types";
 import { updateSymbolVectorNetwork } from "./updateSymbolVector";
@@ -24,6 +25,7 @@ figma.ui.onmessage = (msg: PluginAction) => {
   switch (msg.type) {
     case "create-export-vector":
       createExportVectorFromNodeIdOrNodes(msg.payload.nodeId);
+      createPreviewBlob(msg.payload.nodeId);
       break;
     case "validate-selection-as-symbol":
       validateSelectionAsSymbol(figma.currentPage.selection);
@@ -36,6 +38,10 @@ figma.ui.onmessage = (msg: PluginAction) => {
       break;
     case "export-vector-network-updated":
       updateSymbolVectorNetwork(msg.payload.symbolVectorData);
+      createPreviewBlob(msg.payload.nodeId);
+      break;
+    case "request-preview":
+      createPreviewBlob(msg.payload.nodeId);
       break;
     default:
       break;

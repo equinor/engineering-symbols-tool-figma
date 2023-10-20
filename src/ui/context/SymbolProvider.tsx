@@ -12,6 +12,7 @@ type SymbolContextProviderProps = { children: React.ReactNode };
 
 export type SymbolContextProviderValue = {
   symbol?: EsSymbolUi;
+  previewSvgString?: string;
   setSymbol: (symbol?: EsSymbolUi) => void;
   validationErrors: ValidationError[];
   isValid: boolean;
@@ -31,6 +32,9 @@ export function SymbolContextProvider({
     []
   );
 
+  const [isValid, setIsValid] = useState<boolean>(false);
+
+  const [previewSvgString, setPreviewSvgString] = useState<string>();
   const symbolRef = useRef(symbol);
   const validationErrorsRef = useRef(validationErrors);
 
@@ -43,8 +47,6 @@ export function SymbolContextProvider({
     validationErrorsRef.current = errors;
     _setValidationErrors([...validationErrorsRef.current]);
   };
-
-  const [isValid, setIsValid] = useState<boolean>(false);
 
   useEffect(() => {
     let errors = 0;
@@ -77,6 +79,9 @@ export function SymbolContextProvider({
         break;
       case "export-as-svg":
         saveBlob(msg.payload.uInt8Array, msg.payload.fileName);
+        break;
+      case "symbol-preview":
+        setPreviewSvgString(msg.payload.svgString);
       default:
         break;
     }
@@ -121,6 +126,7 @@ export function SymbolContextProvider({
     <SymbolContext.Provider
       value={{
         symbol,
+        previewSvgString,
         setSymbol,
         validationErrors,
         isValid,

@@ -29,9 +29,10 @@ export function FillRuleEditor() {
   } = useContext(SymbolContext) as SymbolContextProviderValue;
 
   const onM = (nodeData: SymbolVectorData) => {
+    if (!symbol || !symbol.id) return;
     postMessageToPlugin({
       type: "export-vector-network-updated",
-      payload: { symbolVectorData: nodeData },
+      payload: { nodeId: symbol.id, symbolVectorData: nodeData },
     });
   };
 
@@ -69,7 +70,8 @@ export function FillRuleEditor() {
         <button
           className={canCreateExportLayer ? "brand" : "brand-disabled"}
           disabled={!canCreateExportLayer}
-          onClick={() => createExportLayer()}>
+          onClick={() => createExportLayer()}
+        >
           Create Export Layer
         </button>
       </ErrorContent>
