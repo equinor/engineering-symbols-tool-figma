@@ -17,20 +17,20 @@
     "dev": "concurrently \"npm:watch:*\""
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "vite-plugin-svgr": "^4.1.0"
+    "vite-plugin-svgr": "^4.5.0"
   },
   "devDependencies": {
     "@figma/plugin-typings": "*",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "concurrently": "^8.0.0",
-    "esbuild": "^0.17.19",
+    "esbuild": "^0.25.10",
     "prettier": "^2.8.8",
     "typescript": "^5.0.4",
-    "vite": "^4.3.8",
+    "vite": "^7.1.7",
     "vite-plugin-singlefile": "^0.13.5",
     "vite-svg-loader": "^4.0.0"
   }
